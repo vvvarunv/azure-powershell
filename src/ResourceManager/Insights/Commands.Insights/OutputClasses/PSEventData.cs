@@ -12,8 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System;
 using Microsoft.Azure.Insights.Models;
+using System;
 
 namespace Microsoft.Azure.Commands.Insights.OutputClasses
 {
@@ -63,9 +63,9 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
         public string EventName { get; set; }
 
         /// <summary>
-        /// Gets or sets the event source. This value indicates the source that generated the event.
+        /// Gets or sets the category.
         /// </summary>
-        public string EventSource { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// Gets or sets the occurrence time of event
@@ -147,7 +147,6 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
                 ? new PSEventDataAuthorization
                 {
                     Action = eventData.Authorization.Action,
-                    Condition = eventData.Authorization.Condition,
                     Role = eventData.Authorization.Role,
                     Scope = eventData.Authorization.Scope
                 }
@@ -156,10 +155,10 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
             this.Claims = new PSDictionaryElement(eventData.Claims);
             this.CorrelationId = eventData.CorrelationId;
             this.Description = eventData.Description;
-            this.EventChannels = eventData.EventChannels;
+            this.EventChannels = eventData.Channels;
             this.EventDataId = eventData.EventDataId;
             this.EventName = eventData.EventName.Value;
-            this.EventSource = eventData.EventSource.Value;
+            this.Category = eventData.Category.Value;
             this.EventTimestamp = eventData.EventTimestamp;
             this.HttpRequest = eventData.HttpRequest != null
                 ? new PSEventDataHttpRequest
@@ -177,7 +176,7 @@ namespace Microsoft.Azure.Commands.Insights.OutputClasses
             this.Properties = new PSDictionaryElement(eventData.Properties);
             this.ResourceGroupName = eventData.ResourceGroupName;
             this.ResourceProviderName = eventData.ResourceProviderName.Value;
-            this.ResourceId = eventData.ResourceUri;
+            this.ResourceId = eventData.ResourceId;
             this.Status = eventData.Status.Value;
             this.SubmissionTimestamp = eventData.SubmissionTimestamp;
             this.SubscriptionId = eventData.SubscriptionId;

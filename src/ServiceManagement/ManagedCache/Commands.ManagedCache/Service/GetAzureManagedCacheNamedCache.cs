@@ -30,6 +30,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             string cacheServiceName = CacheClient.NormalizeCacheServiceName(Name);
             CacheClient.ProgressRecorder = (p) => { WriteVerbose(p); };
             WriteObject(new PSCacheServiceWithNamedCaches(CacheClient.GetNamedCache(cacheServiceName, NamedCache)));

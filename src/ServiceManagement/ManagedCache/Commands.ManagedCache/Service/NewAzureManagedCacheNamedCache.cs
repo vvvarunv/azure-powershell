@@ -50,6 +50,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             if (string.IsNullOrEmpty(ExpiryPolicy))
             {
                 ExpiryPolicy = _DefaultExpiryPolicy;

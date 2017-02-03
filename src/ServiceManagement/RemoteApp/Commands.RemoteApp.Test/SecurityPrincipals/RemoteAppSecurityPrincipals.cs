@@ -12,14 +12,15 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.RemoteApp.Test
+namespace Microsoft.WindowsAzure.Commands.RemoteApp.Test
 {
     using LocalModels;
     using Common;
-    using Microsoft.Azure.Management.RemoteApp.Cmdlets;
-    using Microsoft.Azure.Management.RemoteApp.Models;
+    using Microsoft.WindowsAzure.Management.RemoteApp.Cmdlets;
+    using Microsoft.WindowsAzure.Management.RemoteApp.Models;
     using System;
     using System.Collections.Generic;
+    using Microsoft.WindowsAzure.Commands.ScenarioTest;
     using Xunit;
 
     public class AzureRemoteAppServiceUser : RemoteAppClientTest
@@ -27,6 +28,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         private string userName = "user1";
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetAllUsers()
         {
             int countOfExpectedUsers = 0;
@@ -70,6 +72,52 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void GetAllUsersForApp()
+        {
+            int countOfExpectedUsers = 0;
+            GetAzureRemoteAppUser MockCmdlet = SetUpTestCommon<GetAzureRemoteAppUser>();
+
+            // Required parameters for this test
+            MockCmdlet.CollectionName = collectionName;
+            MockCmdlet.Alias = appAlias;
+
+            // Setup the environment for testing this cmdlet
+            MockObject.SetUpDefaultRemoteAppCollectionByName(remoteAppManagementClientMock, collectionName);
+            countOfExpectedUsers = MockObject.SetUpRemoteAppSecurityPrincipalsForApp(remoteAppManagementClientMock, collectionName, appAlias, userName);
+            MockCmdlet.ResetPipelines();
+
+            Log("Calling Get-AzureRemoteAppUser which should have {0} users.", countOfExpectedUsers);
+
+            MockCmdlet.ExecuteCmdlet();
+            if (MockCmdlet.runTime().ErrorStream.Count != 0)
+            {
+                Assert.True(false,
+                    String.Format("Get-AzureRemoteAppUser returned the following error {0}.",
+                        MockCmdlet.runTime().ErrorStream[0].Exception.Message
+                    )
+                );
+            }
+
+            List<ConsentStatusModel> users = MockObject.ConvertList<ConsentStatusModel>(MockCmdlet.runTime().OutputPipeline);
+            Assert.NotNull(users);
+
+            Assert.True(users.Count == countOfExpectedUsers,
+                String.Format("The expected number of users returned {0} does not match the actual {1}.",
+                    countOfExpectedUsers,
+                    users.Count
+                )
+            );
+
+            Assert.True(MockObject.ContainsExpectedServicePrincipalList(MockObject.mockUsersConsents, users),
+                "The actual result does not match the expected"
+            );
+
+            Log("The test for Get-AzureRemoteAppUser with {0} users completed successfully.", countOfExpectedUsers);
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetUsersByName()
         {
             int countOfExpectedUsers = 1;
@@ -115,6 +163,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void AddMSAUserThatDoesntExist()
         {
             int countOfExistingUsers = 0;
@@ -158,6 +207,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void AddOrgIDUserThatDoesntExist()
         {
             int countOfExistingUsers = 0;
@@ -202,6 +252,98 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void AddUsersToApp()
+        {
+            int countOfExistingUsers = 0;
+            int countOfNewUsers = 0;
+            AddAzureRemoteAppUser MockCmdlet = SetUpTestCommon<AddAzureRemoteAppUser>();
+
+            // Required parameters for this test
+            MockCmdlet.CollectionName = collectionName;
+            MockCmdlet.Alias = appAlias;
+            MockCmdlet.Type = PrincipalProviderType.OrgId;
+            MockCmdlet.UserUpn = new string[]
+            {
+                "testUser1",
+                "testUser2",
+            };
+
+            // Setup the environment for testing this cmdlet
+            MockObject.SetUpDefaultRemoteAppCollectionByName(remoteAppManagementClientMock, collectionName);
+            countOfExistingUsers = MockObject.SetUpDefaultRemoteAppSecurityPrincipals(remoteAppManagementClientMock, collectionName, userName);
+            countOfNewUsers = MockObject.SetUpRemoteAppUserToAddForApp(remoteAppManagementClientMock, collectionName, appAlias, PrincipalProviderType.OrgId, MockCmdlet.UserUpn);
+            MockCmdlet.ResetPipelines();
+
+            Log("Calling Add-AzureRemoteAppOrgIDUser and adding {0} users.", countOfNewUsers);
+
+            MockCmdlet.ExecuteCmdlet();
+            if (MockCmdlet.runTime().ErrorStream.Count != 0)
+            {
+                Assert.True(false,
+                    String.Format("Add-AzureRemoteAppOrgIDUser returned the following error {0}.",
+                        MockCmdlet.runTime().ErrorStream[0].Exception.Message
+                    )
+                );
+            }
+
+            List<SecurityPrincipalOperationsResult> status = MockObject.ConvertList<SecurityPrincipalOperationsResult>(MockCmdlet.runTime().OutputPipeline);
+            Assert.NotNull(status);
+
+            Assert.True(MockObject.HasExpectedResults<SecurityPrincipalOperationsResult>(status, MockObject.ContainsExpectedStatus),
+                   "The actual result does not match the expected."
+            );
+
+            Log("The test for Add-AzureRemoteAppOrgIDUser successfully added {0} users the new count is {1}.", countOfNewUsers, countOfExistingUsers + countOfNewUsers);
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void RemoveUserThatExistsFromApp()
+        {
+            int countOfExistingUsers = 0;
+            int countOfDeletedUsers = 0;
+            RemoveAzureRemoteAppUser MockCmdlet = SetUpTestCommon<RemoveAzureRemoteAppUser>();
+
+            // Required parameters for this test
+            MockCmdlet.CollectionName = collectionName;
+            MockCmdlet.Alias = appAlias;
+            MockCmdlet.Type = PrincipalProviderType.OrgId;
+            MockCmdlet.UserUpn = new string[]
+            {
+                userName
+            };
+
+            // Setup the environment for testing this cmdlet
+            MockObject.SetUpDefaultRemoteAppCollectionByName(remoteAppManagementClientMock, collectionName);
+            countOfExistingUsers = MockObject.SetUpDefaultRemoteAppSecurityPrincipals(remoteAppManagementClientMock, collectionName, userName);
+            countOfDeletedUsers = MockObject.SetUpRemoteAppUserToRemoveFromApp(remoteAppManagementClientMock, collectionName, appAlias, PrincipalProviderType.OrgId, MockCmdlet.UserUpn);
+            MockCmdlet.ResetPipelines();
+
+            Log("Calling Remove-AzureRemoteAppOrgIdUser and removing {0} users.", countOfDeletedUsers);
+
+            MockCmdlet.ExecuteCmdlet();
+            if (MockCmdlet.runTime().ErrorStream.Count != 0)
+            {
+                Assert.True(false,
+                    String.Format("Remove-AzureRemoteAppMSAUser returned the following error {0}.",
+                        MockCmdlet.runTime().ErrorStream[0].Exception.Message
+                    )
+                );
+            }
+
+            List<SecurityPrincipalOperationsResult> status = MockObject.ConvertList<SecurityPrincipalOperationsResult>(MockCmdlet.runTime().OutputPipeline);
+            Assert.NotNull(status);
+
+            Assert.True(MockObject.HasExpectedResults<SecurityPrincipalOperationsResult>(status, MockObject.ContainsExpectedStatus),
+                   "The actual result does not match the expected."
+            );
+
+            Log("The test for Remove-AzureRemoteAppOrgIdUser successfully removed {0} users the new count is {1}.", countOfDeletedUsers, countOfExistingUsers - countOfDeletedUsers);
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void RemoveMSAUserThatExists()
         {
             int countOfExistingUsers = 0;
@@ -245,6 +387,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void RemoveOrgIDUserThatExists()
         {
             int countOfExistingUsers = 0;

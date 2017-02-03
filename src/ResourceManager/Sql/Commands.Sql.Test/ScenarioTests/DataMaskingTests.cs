@@ -12,40 +12,40 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Microsoft.Azure.Commands.ScenarioTest.SqlTests;
+using Microsoft.Azure.ServiceManagemenet.Common.Models;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Xunit;
+using Xunit.Abstractions;
+using RestTestFramework = Microsoft.Rest.ClientRuntime.Azure.TestFramework;
 
-namespace Microsoft.Azure.Commands.ScenarioTest.SqlTests
+namespace Microsoft.Azure.Commands.Sql.Test.ScenarioTests
 {
     public class DataMaskingTests : SqlTestsBase
     {
-
-        [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestDatabaseDataMaskingPolicyEnablementToggling()
+        protected override void SetupManagementClients(RestTestFramework.MockContext context)
         {
-            RunPowerShellTest("Test-DatabaseDataMaskingPolicyEnablementToggling");
+            var sqlCSMClient = GetSqlClient();
+            var storageClient = GetStorageClient();
+            var storageV2Client = GetStorageV2Client();
+            var resourcesClient = GetResourcesClient();
+            var authorizationClient = GetAuthorizationManagementClient();
+            helper.SetupSomeOfManagementClients(sqlCSMClient, storageClient, storageV2Client, resourcesClient, authorizationClient);
+        }
+
+        public DataMaskingTests(ITestOutputHelper output)
+        {
+            XunitTracingInterceptor.AddToContext(new XunitTracingInterceptor(output));
         }
 
         [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestDatabaseDataMaskingLevelChanges()
+        public void TestDatabaseDataMaskingPrivilegedUsersChanges()
         {
-            RunPowerShellTest("Test-DatabaseDataMaskingLevelChanges");
+            RunPowerShellTest("Test-DatabaseDataMaskingPrivilegedUsersChanges");
         }
 
         [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestDatabaseDataMaskingPrivilegedLoginsChanges()
-        {
-            RunPowerShellTest("Test-DatabaseDataMaskingPrivilegedLoginsChanges");
-        }
-
-        [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void TestDatabaseDataMaskingBasicRuleLifecycle()
         {
@@ -53,7 +53,6 @@ namespace Microsoft.Azure.Commands.ScenarioTest.SqlTests
         }
 
         [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void TestDatabaseDataMaskingNumberRuleLifecycle()
         {
@@ -61,19 +60,24 @@ namespace Microsoft.Azure.Commands.ScenarioTest.SqlTests
         }
 
         [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void TestDatabaseDataMaskingTextRuleLifecycle()
         {
             RunPowerShellTest("Test-DatabaseDataMaskingTextRuleLifecycle");
         }
-        
+
         [Fact]
-        [Trait(Category.RunType, Category.LiveOnly)]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void TestDatabaseDataMaskingRuleCreationFailures()
         {
             RunPowerShellTest("Test-DatabaseDataMaskingRuleCreationFailures");
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void TestDatabaseDataMaskingRuleCreationWithoutPolicy()
+        {
+            RunPowerShellTest("Test-DatabaseDataMaskingRuleCreationWithoutPolicy");
         }
     }
 }

@@ -12,11 +12,11 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.RemoteApp.Test.Common
+namespace Microsoft.WindowsAzure.Commands.RemoteApp.Test.Common
 {
     using Microsoft.Azure;
-    using Microsoft.Azure.Management.RemoteApp;
-    using Microsoft.Azure.Management.RemoteApp.Models;
+    using Microsoft.WindowsAzure.Management.RemoteApp;
+    using Microsoft.WindowsAzure.Management.RemoteApp.Models;
     using Moq;
     using Moq.Language.Flow;
     using System;
@@ -341,6 +341,25 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test.Common
             }
 
             return isIdentical;
+        }
+
+        public static void SetUpDefaultRemoteAppExportTemplateImage(Mock<IRemoteAppManagementClient> clientMock, string sourceCollectionName, string DestinationStorageAccountName, string DestinationStorageAccountKey, string DestinationStorageAccountContainerName, string trackingId)
+        {
+            OperationResultWithTrackingId response = new OperationResultWithTrackingId()
+            {
+                StatusCode = System.Net.HttpStatusCode.Accepted,
+                TrackingId = trackingId,
+                RequestId = "02111-222-3456"
+            };
+
+            mockTrackingId = new List<TrackingResult>()
+            {
+                new TrackingResult(response)
+            };
+
+            ISetup<IRemoteAppManagementClient, Task<OperationResultWithTrackingId>> setup =
+                clientMock.Setup(c => c.TemplateImages.MigrateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+            setup.Returns(Task.Factory.StartNew(() => response));
         }
     }
 }

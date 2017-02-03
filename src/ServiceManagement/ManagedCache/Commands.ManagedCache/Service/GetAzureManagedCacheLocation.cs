@@ -24,6 +24,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
     {
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             List<Microsoft.Azure.Management.ManagedCache.Models.RegionsResponse.Region> locations = CacheClient.GetLocations();
             WriteObject(locations);
         }      

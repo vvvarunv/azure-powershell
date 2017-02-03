@@ -37,6 +37,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
         
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             string cacheServiceName = CacheClient.NormalizeCacheServiceName(Name);
             CacheClient.ProgressRecorder = (p) => { WriteVerbose(p); };
             CacheClient.RemoveNamedCache(cacheServiceName, NamedCache, ConfirmAction, Force.IsPresent);

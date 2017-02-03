@@ -27,6 +27,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             CachingKeysResponse response = CacheClient.GetAccessKeys(Name);
             WriteObject(new CacheAccessKeys(Name, response));
         }      

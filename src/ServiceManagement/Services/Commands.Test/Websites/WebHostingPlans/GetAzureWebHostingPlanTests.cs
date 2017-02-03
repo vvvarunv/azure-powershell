@@ -16,16 +16,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Xunit;
 using Microsoft.WindowsAzure.Commands.Common;
-using Microsoft.Azure.Common.Authentication.Models;
+using Microsoft.Azure.Commands.Common.Authentication.Models;
 using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.Test.Utilities.Websites;
 using Microsoft.WindowsAzure.Commands.Utilities.Websites;
 using Microsoft.WindowsAzure.Commands.Utilities.Websites.Services.WebEntities;
 using Microsoft.WindowsAzure.Commands.Websites.WebHostingPlan;
 using Moq;
-using Microsoft.Azure.Common.Authentication;
+using Microsoft.Azure.Commands.Common.Authentication;
 
 namespace Microsoft.WindowsAzure.Commands.Test.Websites.WebHostingPlans
 {
@@ -33,6 +34,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites.WebHostingPlans
     public class GetAzureWebHostingPlanTests : WebsitesTestBase
     {
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void ListWebHostingPlansTest()
         {
             // Setup
@@ -53,7 +55,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites.WebHostingPlans
                 CommandRuntime = new MockCommandRuntime(),
                 WebsitesClient = clientMock.Object
             };
-            currentProfile = new AzureProfile();
+            currentProfile = new AzureSMProfile();
             var subscription = new AzureSubscription{Id = new Guid(subscriptionId) };
             subscription.Properties[AzureSubscription.Property.Default] = "True";
             currentProfile.Subscriptions[new Guid(subscriptionId)] = subscription;
@@ -69,6 +71,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites.WebHostingPlans
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetAzureWebHostingPlanBasicTest()
         {
             // Setup
@@ -86,7 +89,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites.WebHostingPlans
                 CommandRuntime = new MockCommandRuntime(),
                 WebsitesClient = clientMock.Object
             };
-            currentProfile = new AzureProfile();
+            currentProfile = new AzureSMProfile();
             var subscription = new AzureSubscription{Id = new Guid(subscriptionId) };
             subscription.Properties[AzureSubscription.Property.Default] = "True";
             currentProfile.Subscriptions[new Guid(subscriptionId)] = subscription;

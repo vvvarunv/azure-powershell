@@ -24,9 +24,9 @@ using Microsoft.Azure.Management.ManagedCache;
 using Microsoft.Azure.Management.ManagedCache.Models;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Commands.Common;
-using Microsoft.Azure.Common.Authentication.Models;
+using Microsoft.Azure.Commands.Common.Authentication.Models;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
-using Microsoft.Azure.Common.Authentication;
+using Microsoft.Azure.Commands.Common.Authentication;
 using Hyak.Common;
 
 namespace Microsoft.Azure.Commands.ManagedCache
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Commands.ManagedCache
         private const int MaxNamedCacheCount = 10;
 
         private ManagedCacheClient client;
-        public PSCacheClient(AzureProfile profile, AzureSubscription currentSubscription)
+        public PSCacheClient(AzureSMProfile profile, AzureSubscription currentSubscription)
         {
             client = AzureSession.ClientFactory.CreateClient<ManagedCacheClient>(profile, currentSubscription, AzureEnvironment.Endpoint.ServiceManagement);
         }
@@ -284,6 +284,14 @@ namespace Microsoft.Azure.Commands.ManagedCache
             return cacheResource;
         }
 
+        public string GetManagedCacheRetirementMessage()
+        {
+            var managedCacheRetirementDate = new DateTime(2016, 12, 01, 00, 00, 00, DateTimeKind.Utc);
+            return DateTime.UtcNow > managedCacheRetirementDate 
+                ? "The Azure Managed Cache Service has been retired as of 11/30/2016. Please migrate to the Azure Redis Cache Service. For more information, see http://go.microsoft.com/fwlink/?LinkID=717458" 
+                : "The Azure Managed Cache Service will be retired on 11/30/2016. Please migrate to the Azure Redis Cache Service. For more information, see http://go.microsoft.com/fwlink/?LinkID=717458";
+        }
+
         public void RemoveNamedCache(string cacheServiceName, string namedCacheName, Action<bool, string, string, string, Action> ConfirmAction, bool force)
         {
             if ("default".Equals(namedCacheName))
@@ -482,7 +490,7 @@ namespace Microsoft.Azure.Commands.ManagedCache
                 CloudServiceResource matched = cloudService.Resources.FirstOrDefault(
                    resource => {
                        return IsCachingResource(resource.Type) 
-                        && cacheServiceName.Equals(resource.Name, StringComparison.OrdinalIgnoreCase);
+                           && cacheServiceName.Equals(resource.Name, StringComparison.OrdinalIgnoreCase) && (resource.State == null || resource.State.ToLower() != "unknown");
                    });
 
                 if (matched!=null)

@@ -34,6 +34,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             if (string.IsNullOrEmpty(KeyType))
             {
                 KeyType = PrimaryKeyType;

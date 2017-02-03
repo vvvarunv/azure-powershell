@@ -12,8 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Common.Authentication;
-using Microsoft.Azure.Common.Authentication.Models;
+using Microsoft.Azure.Commands.Common.Authentication;
+using Microsoft.Azure.Commands.Common.Authentication.Models;
 using Microsoft.WindowsAzure.Commands.Common.Properties;
 using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
@@ -27,14 +27,27 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Xunit;
 
 namespace Microsoft.WindowsAzure.Commands.Test.Websites
 {
-    
+    public static class WebsiteCmdletTestsExtensions
+    {
+        public static void ExecuteWithProcessing(this AzureSMCmdlet cmdlt)
+        {
+            cmdlt.InvokeBeginProcessing();
+            cmdlt.ExecuteCmdlet();
+            cmdlt.InvokeEndProcessing();
+
+        }
+    }
+       
     public class GetAzureWebsiteTests : WebsitesTestBase
     {
+
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void ProcessGetWebsiteTest()
         {
             // Setup
@@ -70,6 +83,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetWebsiteProcessShowTest()
         {
             // Setup
@@ -132,12 +146,13 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void ProcessGetWebsiteWithNullSubscription()
         {
-            currentProfile = new AzureProfile(Path.Combine(AzureSession.ProfileDirectory, AzureSession.ProfileFile));
+            currentProfile = new AzureSMProfile(Path.Combine(AzureSession.ProfileDirectory, AzureSession.ProfileFile));
             currentProfile.Subscriptions.Clear();
             currentProfile.Save();
-            AzurePSCmdlet.CurrentProfile = currentProfile;
+            AzureSMCmdlet.CurrentProfile = currentProfile;
 
             // Test
             var getAzureWebsiteCommand = new GetAzureWebsiteCommand
@@ -149,6 +164,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void TestGetAzureWebsiteWithDiagnosticsSettings()
         {
             // Setup
@@ -184,6 +200,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetsWebsiteSlot()
         {
             // Setup
@@ -228,6 +245,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.Websites
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetsSlots()
         {
             // Setup

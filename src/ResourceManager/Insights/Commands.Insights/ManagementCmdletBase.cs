@@ -13,8 +13,8 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using Microsoft.Azure.Common.Authentication;
-using Microsoft.Azure.Common.Authentication.Models;
+using Microsoft.Azure.Commands.Common.Authentication;
+using Microsoft.Azure.Commands.Common.Authentication.Models;
 using Microsoft.Azure.Management.Insights;
 
 namespace Microsoft.Azure.Commands.Insights
@@ -35,12 +35,13 @@ namespace Microsoft.Azure.Commands.Insights
         /// </summary>
         public IInsightsManagementClient InsightsManagementClient
         {
+            // The premise is that a command to establish a context (like Add-AzureRmAccount) has
+            //   been called before this command in order to have a correct CurrentContext
             get
             {
                 if (this.insightsManagementClient == null)
                 {
-                    // The premise is that a command to establish a context (like Add-AzureAccount) has been called before this command in order to have a correct CurrentContext
-                    this.insightsManagementClient = AzureSession.ClientFactory.CreateClient<InsightsManagementClient>(Profile.Context, AzureEnvironment.Endpoint.ResourceManager);
+                    this.insightsManagementClient = AzureSession.ClientFactory.CreateArmClient<InsightsManagementClient>(DefaultProfile.Context, AzureEnvironment.Endpoint.ResourceManager);
                 }
 
                 return this.insightsManagementClient;
@@ -49,22 +50,10 @@ namespace Microsoft.Azure.Commands.Insights
         }
 
         /// <summary>
-        /// Dispose method
-        /// The implementation of IDispose follows the recommeded pattern
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-
-            // The class is not sealed, so this is here in case a derived class is created
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Dispose the resources
         /// </summary>
         /// <param name="disposing">Indicates whether the managed resources should be disposed or not</param>
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (!this.disposed)
             {
@@ -76,6 +65,7 @@ namespace Microsoft.Azure.Commands.Insights
 
                 this.disposed = true;
             }
+            base.Dispose(disposing);
         }
 
         #endregion

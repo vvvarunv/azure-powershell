@@ -28,6 +28,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             List<PSCacheService> cacheServices = CacheClient.GetCacheServices(Name);
             if (!string.IsNullOrEmpty(Name) && cacheServices.Count == 0)
             {

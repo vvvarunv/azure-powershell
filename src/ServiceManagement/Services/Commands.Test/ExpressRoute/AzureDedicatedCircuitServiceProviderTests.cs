@@ -19,6 +19,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Commands.ScenarioTest;
 using Xunit;
 using Microsoft.WindowsAzure.Commands.Common.Test.Mocks;
 using Microsoft.WindowsAzure.Commands.ExpressRoute;
@@ -31,7 +32,7 @@ using Microsoft.Azure;
 namespace Microsoft.WindowsAzure.Commands.Test.ExpressRoute
 {
     
-    public class AzureDedicatedCircuitServiceProviderTests : TestBase
+    public class AzureDedicatedCircuitServiceProviderTests : SMTestBase
     {
         private const string SubscriptionId = "foo";
 
@@ -44,6 +45,7 @@ namespace Microsoft.WindowsAzure.Commands.Test.ExpressRoute
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void ListAzureDedicatedCircuitServiceProviderSuccessful()
         {
             // Setup

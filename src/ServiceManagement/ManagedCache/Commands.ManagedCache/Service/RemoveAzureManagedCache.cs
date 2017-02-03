@@ -31,6 +31,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             ConfirmAction(
                Force.IsPresent,
                string.Format(Properties.Resources.RemoveServiceWarning, Name),

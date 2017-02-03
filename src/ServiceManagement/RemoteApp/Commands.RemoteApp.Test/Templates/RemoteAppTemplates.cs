@@ -12,18 +12,18 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.RemoteApp.Test
+namespace Microsoft.WindowsAzure.Commands.RemoteApp.Test
 {
     using Common;
-    using Microsoft.Azure.Management.RemoteApp.Cmdlets;
-    using Microsoft.Azure.Management.RemoteApp.Models;
+    using Microsoft.WindowsAzure.Management.RemoteApp.Cmdlets;
+    using Microsoft.WindowsAzure.Management.RemoteApp.Models;
+    using Microsoft.WindowsAzure.Commands.ScenarioTest;
     using System;
     using System.Collections.Generic;
     using System.Management.Automation;
     using Xunit;
 
     // Get-AzureRemoteAppResetVpnSharedKey, Get-AzureRemoteAppVpnDeviceConfigScript, Reset-AzureRemoteAppVpnSharedKey
-
     public class NewAzureRemoteAppTemplateImageTest : NewAzureRemoteAppTemplateImage
     {
         /// <summary>
@@ -45,6 +45,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         private string templateId = "1111";
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetAllTemplates()
         {
             int countOfExpectedTemplates = 0;
@@ -83,6 +84,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void GetTemplatesByName()
         {
             int countOfExpectedTemplates = 0;
@@ -125,6 +127,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void RenameTemplate()
         {
             RenameAzureRemoteAppTemplateImage mockCmdlet = SetUpTestCommon<RenameAzureRemoteAppTemplateImage>();
@@ -159,6 +162,7 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
         }
 
         [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
         public void RemoveTemplate()
         {
             RemoveAzureRemoteAppTemplateImage mockCmdlet = SetUpTestCommon<RemoveAzureRemoteAppTemplateImage>();
@@ -182,6 +186,41 @@ namespace Microsoft.Azure.Commands.RemoteApp.Test
             }
 
             Log("The test for Remove-AzureRemoteAppTemplate completed successfully");
+        }
+
+        [Fact]
+        [Trait(Category.AcceptanceType, Category.CheckIn)]
+        public void ExportTemplateImage()
+        {
+            List<TrackingResult> trackingIds = null;
+            ExportAzureRemoteAppTemplateImage mockCmdlet = SetUpTestCommon<ExportAzureRemoteAppTemplateImage>();
+
+            // Required parameters for this test
+            mockCmdlet.CollectionName = collectionName;
+            mockCmdlet.DestinationStorageAccountName = storageAccountName;
+            mockCmdlet.DestinationStorageAccountKey = storageAccountKey;
+            mockCmdlet.DestinationStorageAccountContainerName = containerName;
+
+            // Setup the environment for testing this cmdlet
+            MockObject.SetUpDefaultRemoteAppExportTemplateImage(remoteAppManagementClientMock, mockCmdlet.CollectionName, mockCmdlet.DestinationStorageAccountName, mockCmdlet.DestinationStorageAccountKey, mockCmdlet.DestinationStorageAccountContainerName, trackingId);
+            mockCmdlet.ResetPipelines();
+
+            Log("Calling Export-AzureRemoteAppTemplateImage");
+
+            mockCmdlet.ExecuteCmdlet();
+            if (mockCmdlet.runTime().ErrorStream.Count != 0)
+            {
+                Assert.True(false,
+                    String.Format("Export-AzureRemoteAppTemplateImage returned the following error {0}",
+                        mockCmdlet.runTime().ErrorStream[0].Exception.Message
+                    )
+                );
+            }
+
+            trackingIds = MockObject.ConvertList<TrackingResult>(mockCmdlet.runTime().OutputPipeline);
+            Assert.NotNull(trackingIds);
+
+            Log("The test for Export-AzureRemoteAppTemplateImage completed successfully");
         }
     }
 }

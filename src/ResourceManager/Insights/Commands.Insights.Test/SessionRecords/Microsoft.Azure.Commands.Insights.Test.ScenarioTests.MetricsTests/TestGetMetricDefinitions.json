@@ -1,7 +1,8 @@
 {
     "Entries": [
         {
-            "RequestUri": "/%2Fsubscriptions%2Fa93fb07c-6c93-40be-bf3b-4f0deba10f4b%2FresourceGroups%2FDefault-Web-EastUS%2Fproviders%2Fmicrosoft.web%2Fsites%2Fgaryyang1/metricDefinitions?api-version=2014-04-01&$filter=",
+            "RequestUri": "/subscriptions/a93fb07c-6c93-40be-bf3b-4f0deba10f4b/resourceGroups/Default-Web-EastUS/providers/microsoft.web/sites/garyyang1/metricDefinitions?api-version=2014-04-01&$filter=",
+            "EncodedRequestUri": "L3N1YnNjcmlwdGlvbnMvYTkzZmIwN2MtNmM5My00MGJlLWJmM2ItNGYwZGViYTEwZjRiL3Jlc291cmNlR3JvdXBzL0RlZmF1bHQtV2ViLUVhc3RVUy9wcm92aWRlcnMvbWljcm9zb2Z0LndlYi9zaXRlcy9nYXJ5eWFuZzEvbWV0cmljRGVmaW5pdGlvbnM/YXBpLXZlcnNpb249MjAxNC0wNC0wMSYkZmlsdGVyPQ==",
             "RequestMethod": "GET",
             "RequestBody": "",
             "RequestHeaders": {
@@ -28,9 +29,7 @@
         }
     ],
     "Names": {
-        "Test-GetMetricDefinitions": [
-            ""
-        ]
+        "Test-GetMetricDefinitions": [ "" ]
     },
     "Variables": {
         "SubscriptionId": "a93fb07c-6c93-40be-bf3b-4f0deba10f4b"

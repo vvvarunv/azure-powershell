@@ -38,6 +38,8 @@ namespace Microsoft.Azure.Commands.ManagedCache
 
         public override void ExecuteCmdlet()
         {
+            WriteWarning(CacheClient.GetManagedCacheRetirementMessage());
+
             CacheClient.ProgressRecorder = (message) => { WriteVerbose(message); };
             string memory = memoryDynamicParameterSet.GetMemoryValue(Sku);
             PSCacheService cacheService = new PSCacheService(
